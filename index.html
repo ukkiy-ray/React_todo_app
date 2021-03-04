@@ -26,7 +26,12 @@
                 checked={props.todo.isDone}
                 onChange={() => props.checkTodo(props.todo)}
               />
-              {props.todo.title}
+              <span 
+              className={props.todo.isDone ? 'done' : ''
+              // props.todo.isDone が true だったら done クラスを付けて、そうではなかったら何も付けない
+              }>
+                {props.todo.title}
+              </span>
             </label>
           </li>
         );
@@ -61,6 +66,27 @@
           // リクエストを子要素から受け取った時は、constructor の中で bind をしなければならない(?)
         }
 
+        checkTodo(todo) {
+          // state の値を変更したいが、直接更新することはできないため、一旦コピーを作成する。
+          const todos = this.state.todos.map(todo => {
+            return {id: todo.id, title: todo.title, isDone: todo.isDone};
+          });
+
+          // const pos で何番目の要素の isDone を変更すれば良いか調べる
+          // state.todos の id プロパティの値のみの配列を、まずは map() で作る↓
+          const pos = this.state.todos.map(todo => {
+            return todo.id;
+            // その後に indexOf() で渡されてきた todo.id と同じものが何番目かを調べる↓
+          }).indexOf(todo.id);
+
+          // todos の pos 番目の isDone を反転させる
+          todos[pos].isDone = !todos[pos].isDone;
+
+          // 新しく作った todos で setState() する
+          this.setState({
+            todos: todos
+          });
+        }
 
         render() {
           return (
