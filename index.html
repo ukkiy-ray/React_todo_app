@@ -57,8 +57,9 @@
           );
         });
         return (
+          // もし props.todos の length が true だったら todos にし、 false だったら何もないということなので Nothing to do! と表示
           <ul>
-            {todos}
+            {props.todos.length ? todos: <li>Nothing to do!</li>}
           </ul>
         );
       }
@@ -100,7 +101,24 @@
         }
 
         deleteTodo(todo) {
+          // confirm() で削除前に許可を要請するメッセージを表示
+          // もし confirm() が false だったら return とし、以降の処理を行わないようにする
+          if (!confirm('are you sure?')) {
+            return; 
+          }
 
+          // オブジェクトのプロパティをいじらない時は slice() を使う
+          const todos = this.state.todos.slice();
+          // 同じ todo が何番目か調べる
+          const pos = this.state.todos.indexOf(todo);
+
+          // 要素を削除するためには splice() を使い、 pos 番目から1つ目の項目を削除するように設定する
+          todos.splice(pos, 1);
+
+          // 新しく作った todos で setState() する
+          this.setState({
+            todos: todos
+          });
         }
 
         render() {
