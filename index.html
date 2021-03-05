@@ -25,6 +25,7 @@
 
         return (
           <h1>
+            <button onClick={props.purge}>Purge</button>
             My todos
             <span>({remaining.length}/{props.todos.length})</span>
           </h1>
@@ -113,7 +114,26 @@
           this.deleteTodo = this.deleteTodo.bind(this);
           this.updateItem = this.updateItem.bind(this);
           this.addTodo = this.addTodo.bind(this);
+          this.purge = this.purge.bind(this);
           // リクエストを子要素から受け取った時は、constructor の中で bind をしなければならない(?)
+        }
+
+        // -------------------------------------------------------------------------------------------------------------
+
+        purge() {
+          // confirm() で削除前に許可を要請するメッセージを表示
+          // もし confirm() が false だったら return とし、以降の処理を行わないようにする
+          if (!confirm('are you sure?')) {
+            return;
+          }
+
+          const todos = this.state.todos.filter(todo => {
+            // filter() で todo の isDone が false のものだけを集める
+            return !todo.isDone;
+          });
+          this.setState({
+            todos: todos
+          });
         }
 
         // -------------------------------------------------------------------------------------------------------------
@@ -211,6 +231,7 @@
             <div className="container">
               <TodoHeader
                 todos={this.state.todos}
+                purge={this.purge}
               />
               <TodoList
                 todos={this.state.todos}
