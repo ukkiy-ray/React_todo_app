@@ -64,7 +64,14 @@
         );
       }
 
-      // ↑子  親↓
+      function TodoForm() {
+        return (
+        <form>
+          <input type="text" />
+          <input type="submit" value="Add" />
+        </form>
+        );
+      }
 
       class App extends React.Component {
         // state を設定
@@ -130,6 +137,7 @@
                 checkTodo={this.checkTodo}
                 deleteTodo={this.deleteTodo}
               />
+              <TodoForm/>
             </div>
           );
         }
