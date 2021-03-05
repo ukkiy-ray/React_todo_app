@@ -64,24 +64,29 @@
         );
       }
 
-      function TodoForm() {
+      // item 属性で渡された値は、こちらの関数の props 引数で渡されるため、それをそのまま input type="text" の value 属性に反映させる
+      function TodoForm(props) {
+        // React では UI の変更は setState() のみで行うため、onChange イベントを設定し App コンポーネントで実装する。
         return (
         <form>
-          <input type="text" />
+          <input type="text" value={props.item} onChange={props.updateItem} />
           <input type="submit" value="Add" />
         </form>
         );
       }
+
 
       class App extends React.Component {
         // state を設定
         constructor() {
           super();
           this.state = {
-            todos: todos
+            todos: todos,
+            item: ''
           };
           this.checkTodo = this.checkTodo.bind(this);
           this.deleteTodo = this.deleteTodo.bind(this);
+          this.updateItem = this.updateItem.bind(this);
           // リクエストを子要素から受け取った時は、constructor の中で bind をしなければならない(?)
         }
 
@@ -128,6 +133,14 @@
           });
         }
 
+        // form の値はイベントオブジェクトから取得できるため、 e を引数にする。
+        updateItem(e) {
+          this.setState({
+            // state の中の item を form の target.value とすると form に入力された値が UI に反映される
+            item: e.target.value
+          });
+        }
+
         render() {
           return (
             <div className="container">
@@ -137,7 +150,10 @@
                 checkTodo={this.checkTodo}
                 deleteTodo={this.deleteTodo}
               />
-              <TodoForm/>
+              <TodoForm
+                item={this.state.item}
+                updateItem={this.updateItem}
+              />
             </div>
           );
         }
