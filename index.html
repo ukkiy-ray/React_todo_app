@@ -12,11 +12,7 @@
   <div id="root"></div>
   <script type="text/babel">
     (() => {
-      const todos = [
-        {id: 0, title: 'task 0', isDone: false},
-        {id: 1, title: 'task 1', isDone: false},
-        {id: 2, title: 'task 2', isDone: true}
-      ];
+      const todos = [];
 
       function TodoItem(props) {
         return (
@@ -42,7 +38,7 @@
         );
       }
 
-      // ↑子  親↓
+      // ↑子  親↓ ----------------------------------------------------------------------------------------------------------------
 
       function TodoList(props) {
         const todos = props.todos.map(todo => {
@@ -64,17 +60,27 @@
         );
       }
 
+      // ----------------------------------------------------------------------------------------------------------------------------
+
       // item 属性で渡された値は、こちらの関数の props 引数で渡されるため、それをそのまま input type="text" の value 属性に反映させる
       function TodoForm(props) {
         // React では UI の変更は setState() のみで行うため、onChange イベントを設定し App コンポーネントで実装する。
         return (
-        <form>
+        <form onSubmit={props.addTodo}>
           <input type="text" value={props.item} onChange={props.updateItem} />
           <input type="submit" value="Add" />
         </form>
         );
       }
 
+      // -----------------------------------------------------------------------------------------------------------------------------
+
+      function getUniqueId() {
+        // 適当に時刻と乱数を 36 進数にしてつなげ、それっぽい文字列でかぶらないユニークな id を生成
+        return new Date().getTime().toString(36) + '-' + Math.random().toString(36);
+      }
+
+      // -----------------------------------------------------------------------------------------------------------------------------
 
       class App extends React.Component {
         // state を設定
@@ -87,8 +93,42 @@
           this.checkTodo = this.checkTodo.bind(this);
           this.deleteTodo = this.deleteTodo.bind(this);
           this.updateItem = this.updateItem.bind(this);
+          this.addTodo = this.addTodo.bind(this);
           // リクエストを子要素から受け取った時は、constructor の中で bind をしなければならない(?)
         }
+
+        // -------------------------------------------------------------------------------------------------------------
+
+        addTodo(e) {
+          // submit しても画面遷移しないように、イベントオブジェクトを渡しつつ preventDefault() する
+          e.preventDefault();
+
+          // もし item を trim() したときに、それが空文字だったらそれ以降の処理をしないため return する
+          if (this.state.item.trim() === '') {
+            return;
+          }
+
+          // 追加する todo の内容
+          const item = {
+            id: getUniqueId(),
+            title: this.state.item,
+            isDone: false
+          };
+
+          // state の値を変更したいが、直接更新することはできないため、slice() を使ってコピーを作成する
+          const todos = this.state.todos.slice();
+          // その後 todos に対して item を push() して追加
+          todos.push(item);
+
+          // 新しく作った todos で setState() する
+          this.setState({
+            todos: todos,
+            item: ''
+            // ↑addTodo した時にフォームの中身を空にするために '' で空文字をセット
+          });
+        }
+
+        // -------------------------------------------------------------------------------------------------------------
 
         checkTodo(todo) {
           // state の値を変更したいが、直接更新することはできないため、一旦コピーを作成する。
@@ -112,6 +152,8 @@
           });
         }
 
+        // -------------------------------------------------------------------------------------------------------------
+
         deleteTodo(todo) {
           // confirm() で削除前に許可を要請するメッセージを表示
           // もし confirm() が false だったら return とし、以降の処理を行わないようにする
@@ -133,6 +175,8 @@
           });
         }
 
+        // -------------------------------------------------------------------------------------------------------------
+
         // form の値はイベントオブジェクトから取得できるため、 e を引数にする。
         updateItem(e) {
           this.setState({
@@ -140,6 +184,8 @@
             item: e.target.value
           });
         }
+
+        // -------------------------------------------------------------------------------------------------------------
 
         render() {
           return (
@@ -153,6 +199,7 @@
               <TodoForm
                 item={this.state.item}
                 updateItem={this.updateItem}
+                addTodo={this.addTodo}
               />
             </div>
           );
