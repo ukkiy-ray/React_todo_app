@@ -36,7 +36,7 @@
 
       function TodoItem(props) {
         return (
-          <li key={props.todo.id}>
+          <li>
             <label>
               <input type="checkbox"
                 checked={props.todo.isDone}
@@ -221,6 +221,19 @@
           this.setState({
             // state の中の item を form の target.value とすると form に入力された値が UI に反映される
             item: e.target.value
+          });
+        }
+
+        // -------------------------------------------------------------------------------------------------------------
+        // LocalStorage を用いたデータの永続化処理の実装↓
+        
+        componentDidUpdate() {
+          localStorage.setItem('todos', JSON.stringify(this.state.todos));
+        }
+
+        componentDidMount() {
+          this.setState({
+            todos: JSON.parse(localStorage.getItem('todos')) || []
           });
         }
 
